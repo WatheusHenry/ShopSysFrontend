@@ -41,6 +41,7 @@ const handleRegister = async () => {
 
     router.push('/dashboard');
   } catch (error) {
+    window.alert("Erro ao fazer login, verifique o usuario e a senha")
     console.error(error.message || 'Erro ao fazer registro');
   }
 };

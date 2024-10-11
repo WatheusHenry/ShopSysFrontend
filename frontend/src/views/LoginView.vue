@@ -29,9 +29,10 @@ const handleLogin = async () => {
     const token = await login({ email: email.value, password: password.value });
     localStorage.setItem('token', token.access_token);
     localStorage.setItem('user_id', token.user_id);
-    eventBus.emit('user-logged-in'); // Emitir evento de login
+    eventBus.emit('user-logged-in'); 
     router.push('/dashboard'); 
   } catch (error) {
+    window.alert("Erro ao fazer login, verifique o usuario e a senha")
     console.error(error.message || 'Erro ao fazer login');
   }
 };
