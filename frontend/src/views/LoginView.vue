@@ -9,7 +9,7 @@
         <Button label="Login" icon="pi pi-sign-in" type="submit" class="login-button" />
       </form>
     </div>
-    <RouterLink to="/register">Registre-se</RouterLink>
+    <RouterLink to="/register" class="register-link">Registre-se</RouterLink>
   </div>
 </template>
 
@@ -17,6 +17,7 @@
 import { ref } from 'vue';
 import { useAuthService } from '../services/AuthService';
 import { useRouter } from 'vue-router';
+import eventBus from '@/eventBus';
 
 const email = ref('');
 const password = ref('');
@@ -27,6 +28,8 @@ const handleLogin = async () => {
   try {
     const token = await login({ email: email.value, password: password.value });
     localStorage.setItem('token', token.access_token);
+    localStorage.setItem('user_id', token.user_id);
+    eventBus.emit('user-logged-in'); // Emitir evento de login
     router.push('/dashboard'); 
   } catch (error) {
     console.error(error.message || 'Erro ao fazer login');
@@ -36,6 +39,7 @@ const handleLogin = async () => {
 
 <style >
 .login-container {
+  width: 100%;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -98,5 +102,19 @@ const handleLogin = async () => {
     max-width: 100%;
     padding: 1rem;
   }
+}
+
+.register-link {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.register-link:hover {
+  color: #0056b3;
+  text-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 </style>

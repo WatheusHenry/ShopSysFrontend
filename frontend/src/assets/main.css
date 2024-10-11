@@ -1,6 +1,8 @@
 @import './base.css';
+@import 'primeicons/primeicons.css';
 
 #app {
+  background-color: rgba(252, 252, 252, 0.915);
   width: 100vw;
   height: 100vh;
   margin: 0 auto;

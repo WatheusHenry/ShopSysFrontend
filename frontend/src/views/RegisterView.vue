@@ -12,16 +12,16 @@
         <Button label="Registrar" icon="pi pi-user-plus" type="submit" class="register-button" />
       </form>
     </div>
-    <RouterLink to="/login">Login</RouterLink>
+    <RouterLink to="/login" class="login-link">Login</RouterLink>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { useAuthService } from '../services/AuthService'; // O service para autenticação
+import { useAuthService } from '../services/AuthService'; 
 import { useRouter } from 'vue-router';
+import eventBus from '@/eventBus';
 
-// Campos de entrada
 const name = ref('');
 const email = ref('');
 const password = ref('');
@@ -33,7 +33,12 @@ const router = useRouter();
 const handleRegister = async () => {
   try {
     const token = await register({ name: name.value, email: email.value, password: password.value, password_confirmation: confirmPassword.value });
+    console.log(token)
     localStorage.setItem('token', token.access_token);
+    localStorage.setItem('user_id', token.user_id);
+    eventBus.emit('user-logged-in'); // Emitir evento de login
+
+
     router.push('/dashboard');
   } catch (error) {
     console.error(error.message || 'Erro ao fazer registro');
@@ -44,6 +49,7 @@ const handleRegister = async () => {
 
 <style scoped>
 .register-container {
+  width: 100vw;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -116,5 +122,27 @@ const handleRegister = async () => {
     max-width: 100%;
     padding: 1rem;
   }
+}
+
+.login-link {
+  margin-top: 1rem;
+  /* Espaçamento superior */
+  font-size: 1rem;
+  /* Tamanho da fonte */
+  color: #007bff;
+  /* Cor do texto */
+  text-decoration: none;
+  /* Remove o sublinhado */
+  font-weight: bold;
+  /* Negrito */
+  transition: color 0.3s, text-shadow 0.3s;
+  /* Efeito de transição */
+}
+
+.login-link:hover {
+  color: #0056b3;
+  /* Cor do texto ao passar o mouse */
+  text-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  /* Efeito de sombra ao passar o mouse */
 }
 </style>
