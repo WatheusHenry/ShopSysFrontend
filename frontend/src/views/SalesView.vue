@@ -1,10 +1,10 @@
 <template>
   <section class="content">
-
     <header>
       <h1>Suas vendas</h1>
       <Button label="Cadastrar Venda" icon="pi pi-plus" @click="showCreateSaleModal" />
     </header>
+
     <div class="cards">
       <SalesCardsComponent v-if="true" :totalSales="totalSales" :lastMonthSales="lastMonthSales" />
       <DonutChart v-if="totalSales > 0 && totalComission > 0" :totalSales="totalSales" :totalCommission="totalComission"
@@ -14,26 +14,30 @@
     <Card class="view">
       <template #content>
         <p v-if="!sales.length">Nenhuma venda encontrada.</p>
-        <table v-if="sales.length" class="sales-table">
-          <thead>
-            <tr>
-              <th>ID da Venda</th>
-              <th>Valor da Venda (R$)</th>
-              <th>Comissão (R$)</th>
-              <th>Data da Venda</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in sales" :key="item.id">
-              <td>{{ item.id }}</td>
-              <td>{{ formatCurrency(item.amount) }}</td>
-              <td>{{ formatCurrency(item.commission) }}</td>
-              <td>{{ formatDate(item.created_at) }}</td>
-            </tr>
-          </tbody>
-        </table>
+
+        <div class="table-wrapper" v-if="sales.length">
+          <table class="sales-table">
+            <thead>
+              <tr>
+                <th>ID da Venda</th>
+                <th>Valor da Venda (R$)</th>
+                <th>Comissão (R$)</th>
+                <th>Data da Venda</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in sales" :key="item.id">
+                <td>{{ item.id }}</td>
+                <td>{{ formatCurrency(item.amount) }}</td>
+                <td>{{ formatCurrency(item.commission) }}</td>
+                <td>{{ formatDate(item.created_at) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </template>
     </Card>
+
     <SaleModalComponent :visible="isModalVisible" @update:visible="isModalVisible = $event" @onCreate="createSale" />
   </section>
 </template>
@@ -46,26 +50,22 @@ import SalesCardsComponent from '@/components/SalesCardsComponent.vue';
 import DonutChart from '@/components/DonutChartComponent.vue';
 import SaleModalComponent from '@/components/SaleModalComponent.vue';
 
-
-
 const sales = ref([]);
 const { getSalesByUser } = useSalesService();
-const totalSales = ref(0); 
-const lastMonthSales = ref(0); 
-const totalComission = ref(0)
+const totalSales = ref(0);
+const lastMonthSales = ref(0);
+const totalComission = ref(0);
 const isModalVisible = ref(false);
-
 
 onMounted(async () => {
   const userId = localStorage.getItem('user_id');
   if (userId) {
     try {
       const response = await getSalesByUser(userId);
-      sales.value = response.sales; 
+      sales.value = response.sales;
       totalSales.value = response.totalSales;
       lastMonthSales.value = response.totalLastMonthSales;
-      totalComission.value = response.totalComission
-      
+      totalComission.value = response.totalComission;
     } catch (error) {
       console.error(error.message);
     }
@@ -105,11 +105,10 @@ h1 {
   color: #333;
 }
 
-.cards{
+.cards {
   gap: 1.5rem;
   display: flex;
   width: 85vw;
-
 }
 
 .view {
@@ -120,18 +119,16 @@ h1 {
   width: 85vw;
 }
 
-h2 {
-  font-size: 1.3rem;
-  margin-bottom: 20px;
-  color: #333;
+.table-wrapper {
+  max-height: 35vh;
+  overflow-y: auto;
+  margin-top: 1rem;
+  border-radius: 1rem;
 }
 
 .sales-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-  border-radius: 1rem;
-  overflow: hidden;
 }
 
 .sales-table thead tr {
