@@ -8,6 +8,7 @@
           :feedback="false" />
         <Button label="Login" icon="pi pi-sign-in" type="submit" class="login-button" />
       </form>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
     <RouterLink to="/register" class="register-link">Registre-se</RouterLink>
   </div>
@@ -21,6 +22,7 @@ import eventBus from '@/eventBus';
 
 const email = ref('');
 const password = ref('');
+const errorMessage = ref('');
 const { login } = useAuthService();
 const router = useRouter();
 
@@ -29,10 +31,10 @@ const handleLogin = async () => {
     const token = await login({ email: email.value, password: password.value });
     localStorage.setItem('token', token.access_token);
     localStorage.setItem('user_id', token.user_id);
-    eventBus.emit('user-logged-in'); 
-    router.push('/dashboard'); 
+    eventBus.emit('user-logged-in');
+    router.push('/dashboard');
   } catch (error) {
-    window.alert("Erro ao fazer login, verifique o usuario e a senha")
+    errorMessage.value = "Erro ao fazer login, verifique o e-mail e a senha.";
     console.error(error.message || 'Erro ao fazer login');
   }
 };
@@ -81,6 +83,17 @@ const handleLogin = async () => {
   border: 1px solid #ddd;
   font-size: 1rem;
   transition: border-color 0.3s;
+}
+
+.error-message {
+  margin-top: 1rem;
+  color: #dc3545;
+  font-size: 0.875rem;
+  font-weight: bold;
+  background-color: #f8d7da;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #f5c2c7;
 }
 
 

@@ -7,10 +7,11 @@
         <InputText v-model="email" id="email" class="register-input" placeholder="Digite seu e-mail" />
         <Password v-model="password" id="password" class="register-input" placeholder="Digite sua senha" toggleMask
           :feedback="false" />
-        <Password v-model="confirmPassword" id="password" class="register-input" placeholder="Confirme sua senha"
+        <Password v-model="confirmPassword" id="confirmPassword" class="register-input" placeholder="Confirme sua senha"
           toggleMask :feedback="false" />
         <Button label="Registrar" icon="pi pi-user-plus" type="submit" class="register-button" />
       </form>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
     <RouterLink to="/login" class="login-link">Login</RouterLink>
   </div>
@@ -18,7 +19,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useAuthService } from '../services/AuthService'; 
+import { useAuthService } from '../services/AuthService';
 import { useRouter } from 'vue-router';
 import eventBus from '@/eventBus';
 
@@ -26,26 +27,34 @@ const name = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
+const errorMessage = ref(''); 
 
 const { register } = useAuthService();
 const router = useRouter();
 
 const handleRegister = async () => {
   try {
-    const token = await register({ name: name.value, email: email.value, password: password.value, password_confirmation: confirmPassword.value });
-    console.log(token)
+    if (password.value !== confirmPassword.value) {
+      errorMessage.value = "As senhas não coincidem.";
+      return;
+    }
+
+    const token = await register({
+      name: name.value,
+      email: email.value,
+      password: password.value,
+      password_confirmation: confirmPassword.value
+    });
+
     localStorage.setItem('token', token.access_token);
     localStorage.setItem('user_id', token.user_id);
-    eventBus.emit('user-logged-in'); // Emitir evento de login
-
-
+    eventBus.emit('user-logged-in'); 
     router.push('/dashboard');
   } catch (error) {
-    window.alert("Erro ao fazer login, verifique o usuario e a senha")
+    errorMessage.value = "Erro ao registrar, verifique os dados informados.";
     console.error(error.message || 'Erro ao fazer registro');
   }
 };
-
 </script>
 
 <style scoped>
