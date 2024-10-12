@@ -5,7 +5,7 @@
         <i class="icons pi pi-dollar"></i>Total de Vendas
       </template>
       <template #content>
-        <h2>R$ {{ totalSales }}</h2>
+        <h2>R$ {{ formatCurrency(totalSales) }}</h2>
       </template>
     </Card>
 
@@ -14,7 +14,7 @@
         <i class="icons pi pi-calendar-plus"></i> Vendas do Último Mês
       </template>
       <template #content>
-        <h2>R$ {{ lastMonthSales }}</h2>
+        <h2>R$ {{ formatCurrency(lastMonthSales) }}</h2>
       </template>
     </Card>
 
@@ -23,6 +23,7 @@
 </template>
 
 <script setup>
+import { formatCurrency } from '@/utils/filters';
 
 const props = defineProps({
   totalSales: Number,
