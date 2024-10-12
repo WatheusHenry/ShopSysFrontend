@@ -3,6 +3,7 @@
     <header>
       <h1>Vendedores</h1>
     </header>
+
     <Dialog v-model:visible="isEditing" header="Editar Usuário" :modal="true" :closable="false" :draggable="false"
       class="edit-dialog">
       <template #footer>
@@ -16,6 +17,15 @@
       </form>
     </Dialog>
 
+    <Dialog v-model:visible="isConfirmingDelete" header="Confirmar Exclusão" :modal="true" :closable="false"
+      :draggable="false" class="confirm-dialog">
+      <p>Tem certeza que deseja excluir este usuário?</p>
+      <template #footer>
+        <Button label="Não" icon="pi pi-times" @click="cancelDelete" class="cancel-button" />
+        <Button label="Sim" icon="pi pi-check" @click="confirmDelete" class="delete-confirm-button" />
+      </template>
+    </Dialog>
+
     <Card class="user-management-container">
       <template #content>
         <DataTable :value="users" paginator :rows="5" class="user-datatable">
@@ -25,7 +35,8 @@
           <Column header="Ações">
             <template #body="slotProps">
               <Button icon="pi pi-pencil" @click="editUser(slotProps.data)" class="p-button-text edit-button" />
-              <Button icon="pi pi-trash" @click="deleteU(slotProps.data.id)" class="p-button-text delete-button" />
+              <Button icon="pi pi-trash" @click="confirmDeleteModal(slotProps.data.id)"
+                class="p-button-text delete-button" />
             </template>
           </Column>
         </DataTable>
@@ -43,7 +54,9 @@ const { getUsers, addUser, updateUser, deleteUser } = useUserService();
 const users = ref([]);
 const user = ref({ name: '', email: '' });
 const isEditing = ref(false);
+const isConfirmingDelete = ref(false);
 const editingUserId = ref(null);
+const userIdToDelete = ref(null);
 
 const loadUsers = async () => {
   try {
@@ -69,19 +82,23 @@ const handleSubmit = async () => {
   }
 };
 
-const deleteU = async (id) => {
+const confirmDeleteModal = (id) => {
+  userIdToDelete.value = id;
+  isConfirmingDelete.value = true;
+};
+
+const confirmDelete = async () => {
   try {
-    await deleteUser(id);
+    await deleteUser(userIdToDelete.value);
     await loadUsers();
+    isConfirmingDelete.value = false;
   } catch (error) {
     console.error('Erro ao deletar usuário:', error);
   }
 };
 
-const editUser = (userToEdit) => {
-  user.value = { name: userToEdit.name, email: userToEdit.email };
-  editingUserId.value = userToEdit.id;
-  isEditing.value = true;
+const cancelDelete = () => {
+  isConfirmingDelete.value = false;
 };
 
 const cancelEdit = () => {
@@ -163,5 +180,19 @@ h1 {
 
 .edit-dialog {
   width: 30rem;
+}
+
+.confirm-dialog {
+  width: 20rem;
+}
+
+.delete-confirm-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: white;
 }
 </style>
